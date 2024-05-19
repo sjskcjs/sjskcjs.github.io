@@ -1,15 +1,16 @@
 #centos7安装图形界面
+安装centos7时选基础网络服务
 1.点击编辑中的虚拟网络编辑器，查看VMnet8，NAT模式下的NAT设置，查看子网IP（用于配置添加IP地址）、子网掩码（NATMASK)、网关IP（GATEWAY）
 2.输入命令进入配置
-vim /etc/sysconfig/network-scripts/ifcfg-ens33
+vi /etc/sysconfig/network-scripts/ifcfg-ens33
 3.修改
 BOOTPROTO=dhcp改为BOOTPROTO=static（静态）
 ONBOOT=no改为ONBOOT=yes
 添加IPADDR=  （eg：192.168.75.127）
-       NATMASK=  (255.255.255.0）
-       GATEWAY=   (192.168.75.2)
-   DNS1=119.29.29.29
-   IPV6_PRIVACY=no
+    NATMASK=  (255.255.255.0）
+    GATEWAY=   (192.168.75.2)
+    DNS1=119.29.29.29
+    IPV6_PRIVACY=no
 Ctrl+C
 Shift+: wq
 4.重启网络服务
