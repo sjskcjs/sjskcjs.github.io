@@ -1,0 +1,26 @@
+#centos8挂载U盘
+连上网络
+wget -O /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
+1.连接上光盘
+2.mkdir /mnt/cdrom
+  给U盘
+mount /dev/cdrom   /mnt/cdrom  (将光盘挂载到目录/mnt/cdrom下)
+3.建立本地仓库
+cd /etc/yum.repos.d
+mkdir bak
+mv C*  bak      （移走其他repo文件）
+touch local.repo    (扩展名必须为repo,文件名随意)
+vi local.repo
+输入以下内容：
+[BaseOS]     (中括号中名字随意)
+name=BaseOS   （描述）
+baseurl=file:///mnt/cdrom/BaseOS    (指定yum源所在位置) (http:// ftp://)
+gpgcheck=0   （不检查钥匙）
+enabled=1   （启动）
+[AppStream]
+name=AppStream
+baseurl=file:///mnt/cdrom/AppStream
+gpgcheck=0
+enabled=1
+
+yum install ntfs-3g
