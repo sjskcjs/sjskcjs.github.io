@@ -1,0 +1,37 @@
+#centos7安装图形界面
+1.点击编辑中的虚拟网络编辑器，查看VMnet8，NAT模式下的NAT设置，查看子网IP（用于配置添加IP地址）、子网掩码（NATMASK)、网关IP（GATEWAY）
+2.输入命令进入配置
+vim /etc/sysconfig/network-scripts/ifcfg-ens33
+3.修改
+BOOTPROTO=dhcp改为BOOTPROTO=static（静态）
+ONBOOT=no改为ONBOOT=yes
+添加IPADDR=  （eg：192.168.75.127）
+       NATMASK=  (255.255.255.0）
+       GATEWAY=   (192.168.75.2)
+   DNS1=119.29.29.29
+   IPV6_PRIVACY=no
+Ctrl+C
+Shift+: wq
+4.重启网络服务
+systemctl restart network.service
+5.ping www.baidu.com 看到data就可以了
+6.下载可视化图形界面
+yum groupinstall "X Window System"
+Is this ok[y/d/n]:y 我们在后面填上y就可以，系统自动执行
+7.查看图形界面软件名称是否能够对应得上
+yum grouplist 
+看到GNOME Desktop
+yum groupinstall "GNOME Desktop"
+8.最后进入图形界面
+startx
+9.查看当前是哪种模式
+systemctl get-default
+10.开机启动图形界面
+systemctl set-default graphical.target
+重启系统：reboot
+11.开机启动字符界面模式
+systemctl set-fefault multi-user.target
+reboot
+12.卸载图形化界面
+yum groupremove "GNOME Desktop"
+再次输入startx就无法进入图形界面
