@@ -1,0 +1,64 @@
+1.配置yum源
+2.yum install bind
+3.网络配置
+IPV4手动添加
+IP：192.168.1.100
+NATMASK（子网掩码）：255.255.255.0或24
+GATEWAY（网关）：192.168.1.1
+DNS：192.168.1.100
+4.systemctl start named
+5.新建窗口，修改主配置文件添加区声明
+vim /etc/named.conf
+//建立正向解析域test.com
+两个any，1个no
+include前写
+zone "test.com" IN{
+	type master;
+	file "test.com.zone"; //正向解析数据库文件名
+};
+
+//建立反向解析域1.168.192.rev
+zone "1.168.192.in-addr.arpa" IN{
+        type master;
+        file "192.168.1.rev";
+};
+6.添加标签页，配置正向解析数据库文件即建立正向区域文件/var/named/test.com.zone，
+默认正向解析区域配置文件为named.localhost，复制并进行修改
+cd /var/named
+ll #看模版
+cp named.localhost test.com.zone
+cp named.loopback 192.168.1.rev
+chown :named test.com.zone
+chown :named 192.168.1.rev
+vim test.com.zone
+
+$TTL 1D
+@       IN SOA  @ root.test.com. (
+                                        0       ; serial
+                                        1D      ; refresh
+                                        1H      ; retry
+                                        1W      ; expire
+                                        3H )    ; minimum
+          IN NS              dns.test.com.
+dns       IN A               192.168.1.100
+linux01   IN A               192.168.1.150
+linux02   IN A               192.168.1.200
+web       IN CNAME           linux02.test.com.
+
+vim 192.168.1.rev
+          IN NS     dns.test.com.
+100     IN PTR    dns.test.com.
+150     IN PTR    linux01.test.com.
+200     IN PTR    linux02.test.com.
+
+7.在启动DNS服务之前，先检查配置文件语法的正确性（无输出表示语法正确）
+named-checkconf
+再检查区文件语法的正确性
+named-checkzone test.com  /var/named/test.com.zone
+named-checkzone 1.168.192-inaddr.arpa /var/named/192.168.1.rev
+8.重新启动DNS服务器
+systemctl restart named
+9.关闭防火墙
+systemctl stop firewalld
+setenforce 0
+10.测试host dig nslookup
