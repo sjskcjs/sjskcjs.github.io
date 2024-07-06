@@ -1,0 +1,28 @@
+1.设主机模式，配yum源，设IP地址xx.xx.xx.xx，安装httpd
+yum install httpd -y
+2.cd  /var/www/html
+  touch index.html
+  vim index.html  (输入一些内容)
+3.systemctl  start httpd
+4.vim  /etc/httpd/conf/httpd.conf
+Listen 1234
+Listen 2345
+<VirtualHost xx.xx.xx.xx:1234>
+DocumentRoot  /var/www/html/1234dir
+</VirtualHost>
+<VirtualHost xx.xx.xx.xx:2345>
+DocumentRoot /var/www/html/2345dir
+</VirtualHost>
+注意：其中xx.xx.xx.xx为web服务器的IP地址，/var/www/html/1234dir为使用1234端口的站点对应的存放站点主页的地方，这个可以自己定义，但是必须要建好这样的目录并在目录下放入index.html
+5.cd /var/www/html
+   mkdir 1234dir      (和上面/var/www/html/1234dir对应)
+   cd 1234dir
+   touch index.html
+   vim index.html  输入内容后保存退出
+  注意：2345dir建立和index.html同上面
+6.setenforce 0 
+  systemctl stop firewalld
+  systemctl restart httpd 
+
+7.测试  http://xx.xx.xx.xx:1234
+        http://xx.xx.xx.xx:2345

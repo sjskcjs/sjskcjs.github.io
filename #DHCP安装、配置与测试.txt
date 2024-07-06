@@ -1,0 +1,34 @@
+1.准备一台linux服务器，两台客户端，将所有网络连接更改为仅主机模式，打开虚拟网络编辑器，更改设置，关闭本地DHCP服务
+2.安装dhcp-server，将位于“/usr/share/doc/dhcp*/ ”目录下的样例文件dhcpd.conf.example复制覆盖主配置文件
+yum install dhcp-server
+cp /usr/share/doc/dhcp*/dhcpd.conf.example  /etc/dhcp/dhcpd.conf 
+3.修改主配置文件
+vim /etc/dhcp/dhcpd.conf
+修改后的：
+ddns-update-style none;
+log-facility local7;
+subnet 192.168.2.0 netmask 255.255.255.0 {
+  range 192.168.2.100 192.168.2.200;
+  option domain-name-servers 192.168.2.3;
+  option domain-name "test.com";
+  option routers 192.168.2.254;
+  option broadcast-address 192.168.2.255;
+  default-lease-time 600;
+  max-lease-time 7200;
+}
+host web {
+  hardware ethernet 00:0c:29:2f:cc:50;
+  fixed-address 192.168.2.4;
+}
+4.重启DHCP服务
+systemctl restart dhcpd
+5.在linux客户端修改网络配置
+vim /etc/sysconfig/network-scripts/ifcfg-ens33
+BOOTPROTO=dhcp
+6.启动/关闭网络
+ifdown ens33    ifup ens33
+7.在Windows客户端配置，在Windows命令提示符下，利用ipconfig可以释放IP地址后，重新获取IP地址。
+ipconfig /release
+ipconfig /renew
+8.查看租约数据库文件
+ cat /var/lib/dhcpd/dhcpd.leases
